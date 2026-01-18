@@ -19,8 +19,8 @@ class TwigComponentSdcBundleTest extends TestCase
 
         $config = [
             'auto_discovery' => true,
-            'ux_components_dir' => '%kernel.project_dir%/tests',
-            'component_namespace' => 'Tito10047\\UX\\TwigComponentSdc\\Tests',
+            'ux_components_dir' => '%kernel.project_dir%/tests/Visual/Generated',
+            'component_namespace' => 'Tito10047\\UX\\TwigComponentSdc\\Tests\\Visual\\Generated',
             'placeholder' => '<!-- __UX_TWIG_COMPONENT_ASSETS__ -->',
             'stimulus' => ['enabled' => true],
         ];
@@ -28,8 +28,8 @@ class TwigComponentSdcBundleTest extends TestCase
         $extension->load([$config], $container);
 
         $this->assertTrue($container->hasParameter('twig_component_sdc.auto_discovery'));
-        $this->assertEquals('%kernel.project_dir%/tests', $container->getParameter('twig_component_sdc.ux_components_dir'));
-        $this->assertEquals('Tito10047\\UX\\TwigComponentSdc\\Tests\\', $container->getParameter('twig_component_sdc.component_namespace'));
+        $this->assertEquals('%kernel.project_dir%/tests/Visual/Generated', $container->getParameter('twig_component_sdc.ux_components_dir'));
+        $this->assertEquals('Tito10047\\UX\\TwigComponentSdc\\Tests\\Visual\\Generated\\', $container->getParameter('twig_component_sdc.component_namespace'));
     }
 
     public function testPrependAddsConfiguration(): void

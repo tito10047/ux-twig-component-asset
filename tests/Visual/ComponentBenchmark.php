@@ -67,16 +67,6 @@ class ComponentBenchmark
         $kernel->boot();
         $container = $kernel->getContainer();
         
-        $mockMapper = new class implements \Symfony\Component\AssetMapper\AssetMapperInterface {
-            public function getPublicPath(string $logicalPath): ?string { return '/assets/'.$logicalPath; }
-            public function all(): iterable { return []; }
-            public function getAssetFromElementPath(string $elementPath): ?\Symfony\Component\AssetMapper\MappedAsset { return null; }
-            public function getAsset(string $logicalPath): ?\Symfony\Component\AssetMapper\MappedAsset { return null; }
-            public function getAssetFromSourcePath(string $sourcePath): ?\Symfony\Component\AssetMapper\MappedAsset { return null; }
-            public function allAssets(): iterable { return []; }
-        };
-        $container->set('asset_mapper', $mockMapper);
-
         $twig = $container->get('twig');
         
         $template = '';

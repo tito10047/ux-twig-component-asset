@@ -77,11 +77,11 @@ class BenchmarkKernel extends Kernel
                     $alias->setPublic(true);
                 }
 
-                if (!$container->hasDefinition('asset_mapper')) {
-                    $container->register('asset_mapper', \Symfony\Component\AssetMapper\AssetMapperInterface::class)
-                        ->setPublic(true)
-                        ->setSynthetic(true);
-                }
+        if (!$container->hasDefinition('asset_mapper')) {
+            $container->register('asset_mapper', \Symfony\Component\AssetMapper\AssetMapperInterface::class)
+                ->setPublic(true)
+                ->setSynthetic(true);
+        }
             }
         }, \Symfony\Component\DependencyInjection\Compiler\PassConfig::TYPE_BEFORE_OPTIMIZATION, 1000);
     }
