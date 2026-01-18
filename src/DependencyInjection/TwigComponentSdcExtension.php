@@ -31,6 +31,8 @@ class TwigComponentSdcExtension extends Extension implements PrependExtensionInt
 
         $container->setParameter('twig_component_sdc.auto_discovery', $config['auto_discovery']);
         $container->setParameter('twig_component_sdc.ux_components_dir', $config['ux_components_dir']);
+        $container->register('twig_component_sdc.ux_components_dir', 'string')
+            ->setPublic(true);
 
         $namespace = null;
         if (isset($config['component_namespace'])) {
