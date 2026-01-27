@@ -6,38 +6,23 @@ class ComponentGenerator
 {
     public function generate(string $baseDir, int $count, bool $isSdc): void
     {
-        if (!is_dir($baseDir)) {
-            mkdir($baseDir, 0777, true);
+        $dirName = $isSdc ? 'Sdc' : 'Classic';
+        $fullDir = $baseDir . '/' . $dirName;
+        if (!is_dir($fullDir)) {
+            mkdir($fullDir, 0777, true);
         }
 
-        $namespace = "Tito10047\\UX\\Sdc\\Tests\\Visual\\Generated";
-        if ($isSdc) {
-            $namespace .= "\\Sdc";
-        } else {
-            $namespace .= "\\Classic";
-        }
-
+        $namespace = "Tito10047\\UX\\Sdc\\Tests\\Visual\\Generated\\" . $dirName."\\".$dirName;
         $classNamePrefix = $isSdc ? "Sdc" : "Classic";
 
         for ($i = 1; $i <= $count; $i++) {
             $name = $classNamePrefix . "Comp" . $i;
-            $this->generateComponent($baseDir, $name, $namespace, $isSdc);
+            $this->generateComponent($fullDir, $name, $namespace, $isSdc);
         }
     }
 
     private function generateComponent(string $dir, string $name, string $namespace, bool $isSdc): void
     {
-        $phpContent = <<<PHP
-<?php
-
-namespace $namespace;
-
-use Symfony\UX\TwigComponent\Attribute\AsTwigComponent;
-use Tito10047\UX\Sdc\Attribute\AsSdcComponent;
-
-#[AsTwigComponent('$name')]
-class $name
-PHP;
         if ($isSdc) {
             $phpContent = <<<PHP
 <?php
@@ -45,10 +30,13 @@ PHP;
 namespace $namespace;
 
 use Tito10047\UX\Sdc\Attribute\AsSdcComponent;
+use Tito10047\UX\Sdc\Twig\ComponentNamespaceInterface;
+use Tito10047\UX\Sdc\Twig\Stimulus;
 
 #[AsSdcComponent('$name')]
-class $name
+class $name implements ComponentNamespaceInterface
 {
+    use Stimulus;
 }
 PHP;
         } else {
@@ -65,9 +53,14 @@ class $name
 }
 PHP;
         }
+        
         file_put_contents($dir . "/" . $name . ".php", $phpContent);
 
-        $twigContent = "<div>$name content</div>";
+        if ($isSdc) {
+            $twigContent = "<div data-controller='{{ controller }}'>$name content</div>";
+        } else {
+            $twigContent = "<div>$name content</div>";
+        }
         file_put_contents($dir . "/" . $name . ".html.twig", $twigContent);
 
         if ($isSdc) {

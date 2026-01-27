@@ -32,7 +32,7 @@ ux_sdc:
          "App\\": "src/",
          "App\\Component\\": "src_component/"
       }
-   },
+   }
 }
 ```
 ```text
@@ -49,13 +49,24 @@ src_component/
 namespace App\Component\Alert;
 
 use Tito10047\UX\Sdc\Attribute\AsSdcComponent;
+use Tito10047\UX\Sdc\Twig\ComponentNamespaceInterface;
+use Tito10047\UX\Sdc\Twig\Stimulus;
 
 #[AsSdcComponent] // No need to define names, templates, or assets. It's all inferred!
 class Alert
 {
+    use Stimulus;
+
     public string $type = 'info';
     public string $message;
 }
+```
+
+In the `Alert.html.twig` template, you can then use the automatically generated stimulus controller name:
+```twig
+<div class="alert alert-{{ type }}" {{ stimulus_controller(controller) }}>
+    {{ message }}
+</div>
 ```
 
 > [!TIP]
@@ -68,6 +79,7 @@ class Alert
 * **Automatic Registration:** Every class marked with `#[AsSdcComponent]` is automatically discovered and registered.
 * **Smart Template Mapping:** Forget `template: 'components/Alert.html.twig'`. If the template is in the same folder as your class, it's found automatically.
 * **Asset Orchestration:** CSS and JS files in your component folder are collected during rendering and injected into the `<head>`.
+* **Automatic Stimulus Controllers:** By using the `Stimulus` trait and `ComponentNamespaceInterface`, your component automatically gets a `controller` variable representing its Stimulus controller name based on its namespace.
 * **No "Phantom" Controllers:** Load component-specific CSS via **AssetMapper** without the need for empty Stimulus controllers just for imports.
 * **Performance First:** * **Compiler Pass:** All file discovery happens at build time. Zero reflection in production.
 * **Response Post-processing:** Assets are injected at the end of the request.
@@ -147,11 +159,11 @@ This bundle is designed for high performance with minimal overhead. We've conduc
 
 | Scenario | Classic Approach | SDC Approach | Difference |
 |----------|------------------|--------------|------------|
-| **Warmup (Dev/Debug)** | 759.2ms | 745.4ms | -13.8ms |
-| **Warmup (Prod)** | 578.8ms | 593.8ms | +15.0ms |
-| **Render (Prod Runtime)** | 26.5ms | 27.2ms | +0.7ms |
-| **Render (Dev Runtime - 500 unique)** | 26.5ms | 68.7ms | +42.2ms |
-| **Render (Dev Runtime - 10 unique repeated)** | 26.5ms | 49.7ms | +23.2ms |
+| **Warmup (Dev/Debug)** | 809.8ms | 782.0ms | -27.8ms |
+| **Warmup (Prod)** | 583.1ms | 586.2ms | +3.1ms |
+| **Render (Prod Runtime)** | 26.5ms | 31.6ms | +5.1ms |
+| **Render (Dev Runtime - 500 unique)** | 26.5ms | 88.4ms | +61.9ms |
+| **Render (Dev Runtime - 10 unique repeated)** | 26.5ms | 58.0ms | +31.5ms |
 
 ### Key Findings
 - **Developer Experience (Dev Runtime):** In `dev` mode, there is a measurable overhead for **unique** components (~84µs per component) due to runtime autodiscovery. This allows developers to add CSS/JS/Twig files and see changes instantly without clearing the cache.

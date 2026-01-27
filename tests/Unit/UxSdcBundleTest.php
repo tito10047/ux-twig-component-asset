@@ -6,7 +6,6 @@ use PHPUnit\Framework\TestCase;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Tito10047\UX\Sdc\UxSdcBundle;
 use Symfony\Component\DependencyInjection\Loader\Configurator\ContainerConfigurator;
-
 use Tito10047\UX\Sdc\DependencyInjection\SdcExtension;
 
 class UxSdcBundleTest extends TestCase

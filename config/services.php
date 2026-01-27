@@ -34,10 +34,15 @@ return static function (ContainerConfigurator $container): void {
         ->args([
             service(SdcMetadataRegistry::class),
             service(AssetRegistry::class),
+            '%ux_sdc.component_namespace%',
         ])
         ->tag('kernel.event_listener', [
             'event' => 'Symfony\UX\TwigComponent\Event\PreCreateForRenderEvent',
             'method' => 'onPreCreate',
+        ])
+        ->tag('kernel.event_listener', [
+            'event' => 'Symfony\UX\TwigComponent\Event\PostMountEvent',
+            'method' => 'onPostMount',
         ])
         ->tag('kernel.event_listener', [
             'event' => 'Symfony\UX\TwigComponent\Event\PreRenderEvent',
@@ -48,6 +53,11 @@ return static function (ContainerConfigurator $container): void {
         ->args([
             service(ComponentMetadataResolver::class),
             service(AssetRegistry::class),
+            '%ux_sdc.component_namespace%',
+        ])
+        ->tag('kernel.event_listener', [
+            'event' => 'Symfony\UX\TwigComponent\Event\PostMountEvent',
+            'method' => 'onPostMount',
         ])
         ->tag('kernel.event_listener', [
             'event' => 'Symfony\UX\TwigComponent\Event\PreRenderEvent',

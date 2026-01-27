@@ -16,12 +16,19 @@ class TestKernel extends Kernel
 {
     use MicroKernelTrait;
 
+    private array $configs = [];
+
     public function __construct(
-        private array $configs = [],
-        string $environment = 'test',
+        string|array $configs = [],
+        ?string $environment = 'test',
         bool $debug = true
     ) {
-        parent::__construct($environment, $debug);
+        if (is_string($configs)) {
+            $environment = $configs;
+            $configs = [];
+        }
+        parent::__construct($environment ?? 'test', $debug);
+        $this->configs = $configs;
     }
 
     public function registerBundles(): iterable

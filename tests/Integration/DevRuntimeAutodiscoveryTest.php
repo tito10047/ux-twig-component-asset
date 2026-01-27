@@ -83,10 +83,10 @@ class DevRuntimeAutodiscoveryTest extends IntegrationTestCase
 
         // Použijeme SdcComponent, ktorý má template definovanú v atribúte
         $html = $twig->render('base.html.twig');
-        
+
         /** @var AssetRegistry $assetRegistry */
         $assetRegistry = $container->get(AssetRegistry::class);
-        
+
         // SdcComponent má v atribúte definované css a js, takže by sa mali pridať
         // aj keď je auto_discovery vypnuté.
         $this->assertNotEmpty($assetRegistry->getSortedAssets());

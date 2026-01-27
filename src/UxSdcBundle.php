@@ -15,8 +15,6 @@ use Tito10047\UX\Sdc\DependencyInjection\Configuration;
  */
 class UxSdcBundle extends AbstractBundle
 {
-
-
     public function getContainerExtension(): ?\Symfony\Component\DependencyInjection\Extension\ExtensionInterface
     {
         return new \Tito10047\UX\Sdc\DependencyInjection\SdcExtension();
@@ -30,7 +28,7 @@ class UxSdcBundle extends AbstractBundle
     public function build(ContainerBuilder $container): void
     {
         parent::build($container);
-        
+
         $container->addCompilerPass(new AssetComponentCompilerPass());
     }
 }

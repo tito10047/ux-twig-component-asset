@@ -17,7 +17,7 @@ class EnvironmentCompilerPassTest extends IntegrationTestCase
 
         // V 'prod' prostredí by mal compiler pass bežať a nájsť komponenty
         $this->assertNotNull($metadataRegistry->getMetadata('AutoDiscoveryComponent'), 'Compiler pass should run in prod environment');
-        
+
         $cachePath = $container->getParameter('kernel.cache_dir') . '/sdc_metadata.php';
         $this->assertFileExists($cachePath);
     }
@@ -26,7 +26,7 @@ class EnvironmentCompilerPassTest extends IntegrationTestCase
     {
         // Najprv spustíme v prod, aby sa vytvorila cache
         $this->testCompilerPassIsActiveInProd();
-        
+
         // Potom spustíme v dev
         $kernel = self::bootKernel(['configs' => ['auto_discovery' => true], 'environment' => 'dev']);
         $container = self::getContainer();
@@ -36,7 +36,7 @@ class EnvironmentCompilerPassTest extends IntegrationTestCase
 
         // V 'dev' prostredí by compiler pass nemal bežať, takže metadata budú prázdne
         $this->assertNull($metadataRegistry->getMetadata('AutoDiscoveryComponent'), 'Compiler pass should NOT run in dev environment');
-        
+
         $cachePath = $container->getParameter('kernel.cache_dir') . '/sdc_metadata.php';
         $this->assertFileDoesNotExist($cachePath, 'Cache file should be deleted in dev environment');
     }

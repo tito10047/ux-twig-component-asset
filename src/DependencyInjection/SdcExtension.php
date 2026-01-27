@@ -77,7 +77,7 @@ class SdcExtension extends Extension implements PrependExtensionInterface
     public function prepend(ContainerBuilder $container): void
     {
         $configs = $container->getExtensionConfig('ux_sdc');
-        
+
         $config = [];
         foreach ($configs as $c) {
             $config = array_merge($config, $c);

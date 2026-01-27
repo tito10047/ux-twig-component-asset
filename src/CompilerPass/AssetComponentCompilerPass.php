@@ -33,7 +33,7 @@ final class AssetComponentCompilerPass implements CompilerPassInterface
 
         $autoDiscovery = $container->getParameter('ux_sdc.auto_discovery');
         $twigRoots = $this->collectTwigRoots($container);
-        
+
         $resolver = new ComponentMetadataResolver($twigRoots, $autoDiscovery);
         $componentAssets = $this->processTaggedServices($container, $resolver);
 

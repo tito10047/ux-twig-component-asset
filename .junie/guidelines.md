@@ -63,3 +63,6 @@ class UX\SdcTest extends TestCase
 - Use strict typing where possible.
 - Mirror existing patterns (e.g., directory structure in `src/` and `config/`).
 
+## benchmark
+
+rin benchmark with `./vendor/bin/phpbench run tests/Visual/ComponentBenchmark.php --report=aggregate --bootstrap=tests/Visual/bootstrap.php`
