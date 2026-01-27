@@ -8,6 +8,7 @@ use Symfony\Component\DependencyInjection\Definition;
 use Tito10047\UX\TwigComponentSdc\Attribute\Asset;
 use Tito10047\UX\TwigComponentSdc\Attribute\AsSdcComponent;
 use Tito10047\UX\TwigComponentSdc\Runtime\SdcMetadataRegistry;
+use Tito10047\UX\TwigComponentSdc\Service\ComponentMetadataResolver;
 use ReflectionClass;
 
 final class AssetComponentCompilerPass implements CompilerPassInterface
@@ -32,7 +33,9 @@ final class AssetComponentCompilerPass implements CompilerPassInterface
 
         $autoDiscovery = $container->getParameter('twig_component_sdc.auto_discovery');
         $twigRoots = $this->collectTwigRoots($container);
-        $componentAssets = $this->processTaggedServices($container, $autoDiscovery, $twigRoots);
+        
+        $resolver = new ComponentMetadataResolver($twigRoots, $autoDiscovery);
+        $componentAssets = $this->processTaggedServices($container, $resolver);
 
         $this->dumpCache($cachePath, $componentAssets);
     }
@@ -77,7 +80,7 @@ final class AssetComponentCompilerPass implements CompilerPassInterface
         return array_unique(array_map('realpath', array_filter($twigRoots)));
     }
 
-    private function processTaggedServices(ContainerBuilder $container, bool $autoDiscovery, array $twigRoots): array
+    private function processTaggedServices(ContainerBuilder $container, ComponentMetadataResolver $resolver): array
     {
         $componentAssets = [];
         $taggedServices = $container->findTaggedServiceIds('twig.component');
@@ -102,12 +105,7 @@ final class AssetComponentCompilerPass implements CompilerPassInterface
                 continue;
             }
 
-            $reflectionClass = new ReflectionClass($class);
-            $assets = $this->collectExplicitAssets($reflectionClass);
-
-            if ($autoDiscovery) {
-                $assets = array_merge($assets, $this->performAutoDiscovery($reflectionClass, $twigRoots, $componentName, $componentAssets));
-            }
+            $assets = $resolver->resolveMetadata($class, $componentName, $componentAssets);
 
             if (!empty($assets)) {
                 $componentAssets[$componentName] = $assets;
@@ -115,98 +113,6 @@ final class AssetComponentCompilerPass implements CompilerPassInterface
         }
 
         return $componentAssets;
-    }
-
-    private function collectExplicitAssets(ReflectionClass $reflectionClass): array
-    {
-        $assets = [];
-
-        // 1. Čítanie atribútov #[Asset]
-        foreach ($reflectionClass->getAttributes(Asset::class) as $attribute) {
-            /** @var Asset $asset */
-            $asset = $attribute->newInstance();
-            if ($asset->path) {
-                $assets[] = [
-                    'path' => $asset->path,
-                    'type' => $asset->type ?? '',
-                    'priority' => $asset->priority,
-                    'attributes' => $asset->attributes,
-                ];
-            }
-        }
-
-        // 1b. Čítanie atribútu #[AsSdcComponent]
-        foreach ($reflectionClass->getAttributes(AsSdcComponent::class) as $attribute) {
-            /** @var AsSdcComponent $sdcComponent */
-            $sdcComponent = $attribute->newInstance();
-
-            if ($sdcComponent->css) {
-                $assets[] = [
-                    'path' => $sdcComponent->css,
-                    'type' => 'css',
-                    'priority' => 0,
-                    'attributes' => [],
-                ];
-            }
-
-            if ($sdcComponent->js) {
-                $assets[] = [
-                    'path' => $sdcComponent->js,
-                    'type' => 'js',
-                    'priority' => 0,
-                    'attributes' => [],
-                ];
-            }
-        }
-
-        return $assets;
-    }
-
-    private function performAutoDiscovery(ReflectionClass $reflectionClass, array $twigRoots, string $componentName, array &$componentAssets): array
-    {
-        $assets = [];
-        $dir = dirname($reflectionClass->getFileName());
-        $baseName = $reflectionClass->getShortName();
-
-        // CSS a JS auto-discovery
-        foreach (['css', 'js'] as $ext) {
-            $assetFile = realpath($dir . DIRECTORY_SEPARATOR . $baseName . '.' . $ext);
-            if ($assetFile && file_exists($assetFile)) {
-                $shortestPath = $this->findShortestRelativePath($assetFile, $twigRoots);
-                $assets[] = [
-                    'path' => $shortestPath ?: ($baseName . '.' . $ext),
-                    'type' => $ext,
-                    'priority' => 0,
-                    'attributes' => [],
-                ];
-            }
-        }
-
-        // Twig template auto-discovery
-        $twigFile = realpath($dir . DIRECTORY_SEPARATOR . $baseName . '.html.twig');
-        if ($twigFile && file_exists($twigFile)) {
-            $shortestPath = $this->findShortestRelativePath($twigFile, $twigRoots);
-            if ($shortestPath) {
-                $componentAssets[$componentName . '_template'] = $shortestPath;
-            }
-        }
-
-        return $assets;
-    }
-
-    private function findShortestRelativePath(string $filePath, array $roots): ?string
-    {
-        $shortestPath = null;
-        foreach ($roots as $root) {
-            if (str_starts_with($filePath, $root)) {
-                $relativePath = ltrim(substr($filePath, strlen($root)), DIRECTORY_SEPARATOR);
-                if ($shortestPath === null || strlen($relativePath) < strlen($shortestPath)) {
-                    $shortestPath = $relativePath;
-                }
-            }
-        }
-
-        return $shortestPath;
     }
 
     private function dumpCache(string $path, array $data): void

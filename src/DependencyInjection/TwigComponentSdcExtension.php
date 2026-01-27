@@ -8,6 +8,7 @@ use Symfony\Component\DependencyInjection\Extension\PrependExtensionInterface;
 use Symfony\Component\DependencyInjection\Loader\PhpFileLoader;
 use Symfony\Component\Config\FileLocator;
 use Tito10047\UX\TwigComponentSdc\Runtime\SdcMetadataRegistry;
+use Tito10047\UX\TwigComponentSdc\Service\ComponentMetadataResolver;
 
 class TwigComponentSdcExtension extends Extension implements PrependExtensionInterface
 {
@@ -18,6 +19,18 @@ class TwigComponentSdcExtension extends Extension implements PrependExtensionInt
 
         $loader = new PhpFileLoader($container, new FileLocator(__DIR__ . '/../../config'));
         $loader->load('services.php');
+
+        $container->setParameter('twig_component_sdc.auto_discovery', $config['auto_discovery']);
+        $container->setParameter('twig_component_sdc.ux_components_dir', $config['ux_components_dir']);
+
+        $this->registerMetadataResolver($container, $config);
+
+        $env = $container->hasParameter('kernel.environment') ? $container->getParameter('kernel.environment') : 'prod';
+        if ($env === 'dev') {
+            $container->removeDefinition('Tito10047\UX\TwigComponentSdc\EventListener\ComponentRenderListener');
+        } else {
+            $container->removeDefinition('Tito10047\UX\TwigComponentSdc\EventListener\DevComponentRenderListener');
+        }
 
         if ($container->hasDefinition('Tito10047\UX\TwigComponentSdc\EventListener\AssetResponseListener')) {
             $container->getDefinition('Tito10047\UX\TwigComponentSdc\EventListener\AssetResponseListener')
@@ -100,6 +113,29 @@ class TwigComponentSdcExtension extends Extension implements PrependExtensionInt
                 ],
             ]);
         }
+    }
+
+    private function registerMetadataResolver(ContainerBuilder $container, array $config): void
+    {
+        $twigRoots = [];
+        if ($container->hasParameter('kernel.project_dir')) {
+            $twigRoots[] = $container->getParameter('kernel.project_dir') . '/src_component';
+        }
+
+        if ($container->hasParameter('twig.default_path')) {
+            $twigRoots[] = $container->getParameter('twig.default_path');
+        }
+
+        $twigRoots[] = $config['ux_components_dir'];
+
+        // V runtime prostredí (Extension::load) nemáme prístup k extension configom iných bundleov tak jednoducho ako v Compiler Pass.
+        // Ale pre dev prostredie to väčšinou stačí takto, alebo sa dajú pridať ďalšie cesty.
+
+        $container->register(ComponentMetadataResolver::class)
+            ->setArguments([
+                $twigRoots,
+                $config['auto_discovery'],
+            ]);
     }
 
     private function registerClasses(ContainerBuilder $container, string $namespace, string $resource): void

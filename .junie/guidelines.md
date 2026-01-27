@@ -63,16 +63,3 @@ class UX\TwigComponentSdcTest extends TestCase
 - Use strict typing where possible.
 - Mirror existing patterns (e.g., directory structure in `src/` and `config/`).
 
-### Project Architecture (from `zadanie.md`)
-The bundle consists of several key components that need to be implemented:
-- `Asset`: Attribute for marking component classes with their assets.
-- `AssetRegistry`: Service to collect assets during a request.
-- `AssetComponentCompilerPass`: Scans components at build time to prepare an asset map (supports auto-discovery).
-- `ComponentRenderListener`: Listens to `PreCreateForRenderEvent` to trigger asset collection.
-- `AssetResponseListener`: Injects collected assets into the HTML response and adds preload headers.
-- `AssetExtension`: Twig extension for the `render_component_assets()` function.
-
-### Key Logic
-- Assets are collected only when a component is actually rendered.
-- Placeholders in HTML are replaced in `KernelEvents::RESPONSE`.
-- HTTP `Link` headers with `rel=preload` should be added for optimized loading.

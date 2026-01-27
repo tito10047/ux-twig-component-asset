@@ -3,8 +3,10 @@
 use Symfony\Component\DependencyInjection\Loader\Configurator\ContainerConfigurator;
 use Tito10047\UX\TwigComponentSdc\Runtime\SdcMetadataRegistry;
 use Tito10047\UX\TwigComponentSdc\Service\AssetRegistry;
+use Tito10047\UX\TwigComponentSdc\Service\ComponentMetadataResolver;
 use Tito10047\UX\TwigComponentSdc\EventListener\AssetResponseListener;
 use Tito10047\UX\TwigComponentSdc\EventListener\ComponentRenderListener;
+use Tito10047\UX\TwigComponentSdc\EventListener\DevComponentRenderListener;
 use Tito10047\UX\TwigComponentSdc\Twig\AssetExtension;
 use Symfony\Component\AssetMapper\AssetMapperInterface;
 
@@ -36,6 +38,16 @@ return static function (ContainerConfigurator $container): void {
         ->tag('kernel.event_listener', [
             'event' => 'Symfony\UX\TwigComponent\Event\PreCreateForRenderEvent',
             'method' => 'onPreCreate',
+        ])
+        ->tag('kernel.event_listener', [
+            'event' => 'Symfony\UX\TwigComponent\Event\PreRenderEvent',
+            'method' => 'onPreRender',
+        ]);
+
+    $services->set(DevComponentRenderListener::class)
+        ->args([
+            service(ComponentMetadataResolver::class),
+            service(AssetRegistry::class),
         ])
         ->tag('kernel.event_listener', [
             'event' => 'Symfony\UX\TwigComponent\Event\PreRenderEvent',
