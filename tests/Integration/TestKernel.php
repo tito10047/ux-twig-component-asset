@@ -36,6 +36,7 @@ class TestKernel extends Kernel
 
     protected function configureContainer(ContainerBuilder $container, LoaderInterface $loader): void
     {
+        $container->setParameter('kernel.environment', $this->getEnvironment());
         $container->loadFromExtension('framework', [
             'secret'               => 'test_secret',
             'test'                 => true,
