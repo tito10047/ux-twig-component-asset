@@ -20,7 +20,11 @@ final class ComponentRenderListener
     public function onPreCreate(PreCreateForRenderEvent $event): void
     {
         $componentName = $event->getName();
-        $assets = $this->metadataRegistry->getMetadata($componentName) ?? [];
+        $assets = $this->metadataRegistry->getMetadata($componentName);
+
+        if (!$assets) {
+            return;
+        }
 
         foreach ($assets as $asset) {
             $type = $asset['type'];
@@ -43,7 +47,7 @@ final class ComponentRenderListener
         $componentName = $event->getMetadata()->getName();
         $templatePath = $this->metadataRegistry->getMetadata($componentName . '_template');
 
-        if (is_string($templatePath)) {
+        if ($templatePath) {
             $event->setTemplate($templatePath);
         }
     }

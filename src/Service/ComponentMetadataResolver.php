@@ -27,6 +27,10 @@ class ComponentMetadataResolver
             $assets = array_merge($assets, $this->performAutoDiscovery($reflectionClass, $componentName, $allMetadata));
         }
 
+        if (empty($assets)) {
+            return [];
+        }
+
         return $assets;
     }
 

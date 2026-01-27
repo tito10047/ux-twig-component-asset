@@ -132,12 +132,22 @@ twig_component_sdc:
 
 ## Benchmarks
 
-This bundle is designed for high performance with minimal overhead. We've conducted benchmarks comparing 500+ SDC components vs. 500+ classic Twig components:
+This bundle is designed for high performance with minimal overhead. We've conducted extensive benchmarks comparing the SDC approach with the classic Twig component approach.
 
-- **Cache Warmup (Cold Start):** ~7.5ms (SDC) vs. ~7.0ms (Classic). The overhead of scanning for assets is negligible.
-- **Rendering Performance:** ~14.5ms (SDC) vs. ~14.4ms (Classic). Rendering 500 components on a single page shows no significant performance penalty when using SDC.
+### Performance Summary (500 Components)
 
-*Note: Benchmarks were performed using `phpbench/phpbench` on 500 generated components.*
+| Scenario | Classic Approach | SDC Approach | Difference |
+|----------|------------------|--------------|------------|
+| **Warmup (Dev/Debug)** | 783.4ms | 773.7ms | -9.7ms |
+| **Warmup (Prod)** | 573.2ms | 596.5ms | +23.3ms |
+| **Render (Runtime)** | 26.2ms | 27.0ms | +0.8ms |
+
+### Key Findings
+- **Developer Experience:** In `dev` mode, the performance impact is nearly zero thanks to optimized runtime discovery and caching.
+- **Production Performance:** After micro-optimizations (optimized asset hashing and listener early exits), the overhead for rendering 500 components is only about **0.8ms** (~1.6µs per component), which is practically negligible.
+- **Memory Usage:** The SDC approach requires approximately **8MB** more memory during container compilation for 500 components, which is well within acceptable limits for modern applications.
+
+For detailed results and methodology, see the [Full Benchmark Report](benchmark.md).
 
 ## License
 

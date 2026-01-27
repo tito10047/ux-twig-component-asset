@@ -14,7 +14,10 @@ final class AssetRegistry
      */
     public function addAsset(string $path, string $type, int $priority = 0, array $attributes = []): void
     {
-        $key = md5($path . $type . serialize($attributes));
+        $key = $path . '|' . $type;
+        if (!empty($attributes)) {
+            $key .= '|' . serialize($attributes);
+        }
 
         if (!isset($this->assets[$key])) {
             $this->assets[$key] = [

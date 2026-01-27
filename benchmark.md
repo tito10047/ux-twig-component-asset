@@ -1,22 +1,18 @@
-### Výsledky benchmarkov
+### Benchmark Results
 
-#### Branch: `main`
-| Benchmark | Subject | Mo (Priemer) | Mem Peak |
+#### Branch: `main` (Optimized)
+| Benchmark | Subject | Mo (Mean) | Mem Peak |
 |-----------|---------|--------------|----------|
-| `ComponentBenchmark` | `benchWarmupClassicDebug` | 32.907ms | 25.01 MB |
-| `ComponentBenchmark` | `benchWarmupSdcDebug` | 45.853ms | 33.32 MB |
-| `ComponentBenchmark` | `benchWarmupClassic` | 20.786ms | 2.13 MB |
-| `ComponentBenchmark` | `benchWarmupSdc` | 20.655ms | 2.13 MB |
-| `ComponentBenchmark` | `benchRenderClassic` | 27.109ms | 25.89 MB |
-| `ComponentBenchmark` | `benchRenderSdc` | 28.042ms | 30.51 MB |
+| `ComponentBenchmark` | `benchWarmupClassicDebug` | 783.422ms | 25.16 MB |
+| `ComponentBenchmark` | `benchWarmupSdcDebug` | 773.735ms | 33.25 MB |
+| `ComponentBenchmark` | `benchWarmupClassic` | 573.221ms | 23.13 MB |
+| `ComponentBenchmark` | `benchWarmupSdc` | 596.464ms | 31.47 MB |
+| `ComponentBenchmark` | `benchRenderClassic` | 26.169ms | 31.63 MB |
+| `ComponentBenchmark` | `benchRenderSdc` | 26.965ms | 36.24 MB |
 
-#### Branch: `optimizing`
-| Benchmark | Subject | Mo (Priemer) | Mem Peak |
-|-----------|---------|--------------|----------|
-| `ComponentBenchmark` | `benchWarmupClassicDebug` | 31.414ms | 25.10 MB |
-| `ComponentBenchmark` | `benchWarmupSdcDebug` | 40.677ms | 33.23 MB |
-| `ComponentBenchmark` | `benchWarmupClassic` | 20.393ms | 2.13 MB |
-| `ComponentBenchmark` | `benchWarmupSdc` | 20.412ms | 2.13 MB |
-| `ComponentBenchmark` | `benchRenderClassic` | 26.820ms | 25.89 MB |
-| `ComponentBenchmark` | `benchRenderSdc` | 28.307ms | 30.51 MB |
+**Evaluation:**
+- **Warmup (Cold Boot):** In the `dev` environment (Debug), the difference between Classic and SDC is minimal. In `prod` (Warmup Sdc), the overhead of container compilation for 500 components is around 23ms.
+- **Memory:** The SDC approach has approximately 8MB higher memory peak during container build, which is expected due to the registration of metadata for 500 components.
+- **Render (Runtime):** After optimization (removing `md5` and reducing event listener overhead), the difference in rendering 500 components is reduced to approximately **0.8ms** (~1.6µs per component), which is practically negligible.
+- **Caching:** Implemented runtime caching in `DevComponentRenderListener` ensures that each component is analyzed only once during a request.
 

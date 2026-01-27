@@ -38,8 +38,8 @@ class ComponentBenchmark
 		$generator->generate($this->generatedDir . '/Sdc', 500, true);
 
 		// 2. Vytvorenie stress-test šablóny pre Twig (aby sme nemerali Twig compilation)
-		$this->createStressTestTemplate('classic', 1000);
-		$this->createStressTestTemplate('sdc', 1000);
+		$this->createStressTestTemplate('classic', 500);
+		$this->createStressTestTemplate('sdc', 500);
 	}
 
 	private function createStressTestTemplate(string $type, int $count): void
@@ -60,6 +60,11 @@ class ComponentBenchmark
 		if (is_dir($cacheDir)) {
 			$this->fs->remove($cacheDir);
 		}
+		
+		$benchmarkCacheDir = sys_get_temp_dir() . '/UX/TwigComponentSdc/benchmark/' . $env;
+		if (is_dir($benchmarkCacheDir)) {
+			$this->fs->remove($benchmarkCacheDir);
+		}
 	}
 
 	// --- WARMUP BENCHMARKS (Cold Boot) DEBUG mode ---
@@ -72,7 +77,7 @@ class ComponentBenchmark
 	public function benchWarmupClassicDebug(): void
 	{
 		$this->clearCache('classic');
-		$kernel = new BenchmarkKernel('classic',"prod", true);
+		$kernel = new BenchmarkKernel('classic',"dev", true);
 		$kernel->boot();
 	}
 
@@ -84,7 +89,7 @@ class ComponentBenchmark
 	public function benchWarmupSdcDebug(): void
 	{
 		$this->clearCache('sdc');
-		$kernel = new BenchmarkKernel('sdc', "prod",true);
+		$kernel = new BenchmarkKernel('sdc', "dev", true);
 		$kernel->boot();
 	}
 

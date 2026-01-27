@@ -34,6 +34,11 @@ final class AssetResponseListener
         }
 
         $assets = $this->assetRegistry->getSortedAssets();
+        if (empty($assets)) {
+            $response->setContent(str_replace($this->placeholder, '', $content));
+            return;
+        }
+
         $html = '';
         $links = [];
 
