@@ -37,9 +37,10 @@ class ComponentBenchmark
 		$generator->generate($this->generatedDir . '/Classic', 500, false);
 		$generator->generate($this->generatedDir . '/Sdc', 500, true);
 
-		// 2. Vytvorenie stress-test šablóny pre Twig (aby sme nemerali Twig compilation)
+		// 2. Vytvorenie stress-test šablón pre Twig
 		$this->createStressTestTemplate('classic', 500);
 		$this->createStressTestTemplate('sdc', 500);
+		$this->createRepeatedStressTestTemplate('sdc', 10, 500);
 	}
 
 	private function createStressTestTemplate(string $type, int $count): void
@@ -51,6 +52,19 @@ class ComponentBenchmark
 		}
 
 		$path = $this->generatedDir."/".ucfirst($type) . "/stress_test_$type.html.twig";
+		file_put_contents($path, $content);
+	}
+
+	private function createRepeatedStressTestTemplate(string $type, int $uniqueCount, int $totalCount): void
+	{
+		$content = '';
+		$prefix = $type === 'sdc' ? 'SdcComp' : 'ClassicComp';
+		for ($i = 0; $i < $totalCount; $i++) {
+			$index = ($i % $uniqueCount) + 1;
+			$content .= "<twig:$prefix$index />\n";
+		}
+
+		$path = $this->generatedDir."/".ucfirst($type) . "/repeated_test_$type.html.twig";
 		file_put_contents($path, $content);
 	}
 
@@ -163,5 +177,19 @@ class ComponentBenchmark
 
 		$twig = $kernel->getContainer()->get('twig');
 		$twig->render('stress_test_sdc.html.twig');
+	}
+
+	/**
+	 * Meria rýchlosť renderu pre SDC v DEV prostredí s opakovanými komponentmi (cache v akcii).
+	 * @Revs(10)
+	 * @Iterations(5)
+	 */
+	public function benchRenderSdcDevRepeated(): void
+	{
+		$kernel = new BenchmarkKernel('sdc', "dev", true);
+		$kernel->boot();
+
+		$twig = $kernel->getContainer()->get('twig');
+		$twig->render('repeated_test_sdc.html.twig');
 	}
 }

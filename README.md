@@ -141,12 +141,14 @@ This bundle is designed for high performance with minimal overhead. We've conduc
 | **Warmup (Dev/Debug)** | 759.2ms | 745.4ms | -13.8ms |
 | **Warmup (Prod)** | 578.8ms | 593.8ms | +15.0ms |
 | **Render (Prod Runtime)** | 26.5ms | 27.2ms | +0.7ms |
-| **Render (Dev Runtime)** | 26.5ms | 68.8ms | +42.3ms |
+| **Render (Dev Runtime - 500 unique)** | 26.5ms | 68.7ms | +42.2ms |
+| **Render (Dev Runtime - 10 unique repeated)** | 26.5ms | 49.7ms | +23.2ms |
 
 ### Key Findings
-- **Developer Experience (Dev Runtime):** In `dev` mode, there is a measurable overhead (~84µs per component) due to runtime autodiscovery. This allows developers to add CSS/JS/Twig files and see changes instantly without clearing the cache.
-- **Production Performance:** In `prod` mode, the overhead for rendering 500 components is only about **0.7ms** (~1.4µs per component), which is practically negligible.
-- **Warmup:** The SDC approach slightly increases container compilation time in `prod` (~15ms for 500 components) but remains very efficient.
+- **Developer Experience (Dev Runtime):** In `dev` mode, there is a measurable overhead for **unique** components (~84µs per component) due to runtime autodiscovery. This allows developers to add CSS/JS/Twig files and see changes instantly without clearing the cache.
+- **Caching:** Thanks to internal metadata caching, repeated rendering of the same component in `dev` is significantly faster as the file system is only scanned once per unique component class per request.
+- **Production Performance:** In `prod` mode, the overhead for rendering 500 unique components is practically zero, as all metadata is pre-generated during container compilation.
+- **Warmup:** The SDC approach slightly increases container compilation time in `prod` (~15ms for 500 unique components) but remains very efficient.
 - **Memory Usage:** The SDC approach requires approximately **8MB** more memory during container compilation for 500 components, which is well within acceptable limits for modern applications.
 
 For detailed results and methodology, see the [Full Benchmark Report](benchmark.md).

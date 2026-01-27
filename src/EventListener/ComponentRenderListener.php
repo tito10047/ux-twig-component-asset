@@ -27,14 +27,9 @@ final class ComponentRenderListener
         }
 
         foreach ($assets as $asset) {
-            $type = $asset['type'];
-            if ('' === $type) {
-                $type = str_ends_with($asset['path'], '.css') ? 'css' : 'js';
-            }
-
             $this->assetRegistry->addAsset(
                 $asset['path'],
-                $type,
+                $asset['type'] ?: (str_ends_with($asset['path'], '.css') ? 'css' : 'js'),
                 $asset['priority'],
                 $asset['attributes']
             );
