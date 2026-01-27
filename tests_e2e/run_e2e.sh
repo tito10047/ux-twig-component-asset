@@ -4,9 +4,11 @@ set -e
 SCRIPT_DIR=$(cd "$(dirname "$0")" && pwd)
 PROJECT_ROOT=$(cd "$SCRIPT_DIR/.." && pwd)
 
-if [ ! -d "e2e-test" ]; then
-    mkdir -p e2e-test
+if [ -d "e2e-test" ]; then
+  rm -rf e2e-test
 fi
+
+mkdir -p e2e-test
 cd e2e-test
 
 if [ ! -d "dummy-project" ]; then
@@ -15,7 +17,7 @@ fi
 cd dummy-project
 
 # 2. Konfigurácia lokálneho repozitára a symfony/flex
-composer config repositories.local "{\"type\": \"path\", \"url\": \"$PROJECT_ROOT\", \"canonical\": false, \"options\": {\"symlink\": false}}"
+composer config repositories.local "{\"type\": \"path\", \"url\": \"$PROJECT_ROOT\", \"canonical\": false, \"options\": {\"symlink\": true}}"
 composer config extra.symfony.allow-contrib true
 composer config minimum-stability dev
 composer config prefer-stable true
@@ -42,6 +44,18 @@ fi
 # 4. Inštalácia závislostí
 composer require symfony/twig-bundle symfony/ux-twig-component webapp --no-interaction --no-scripts
 composer require tito10047/ux-sdc:* --no-interaction --no-scripts
+
+# 4b. Registrácia bundle v bundles.php
+if [ -f "config/bundles.php" ]; then
+php -r '
+$bundlesFile = "config/bundles.php";
+$content = file_get_contents($bundlesFile);
+if (strpos($content, "Tito10047\\UX\\Sdc\\UxSdcBundle") === false) {
+    $content = str_replace("];", "    Tito10047\\UX\\Sdc\\UxSdcBundle::class => [\"all\" => true],\n];", $content);
+    file_put_contents($bundlesFile, $content);
+}
+'
+fi
 
 # 5. Kopírovanie E2E testovacích súborov (z tests_e2e/basic)
 cp -r "$PROJECT_ROOT/tests_e2e/basic/"* .
