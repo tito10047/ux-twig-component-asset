@@ -88,6 +88,10 @@ final class AssetComponentCompilerPass implements CompilerPassInterface
 
             // 1. Čítanie atribútov #[Asset]
             $attributes = $reflectionClass->getAttributes(Asset::class);
+			$sdcAttributes = $reflectionClass->getAttributes(AsSdcComponent::class);
+			if (empty($attributes) && empty($sdcAttributes)) {
+				continue;
+			}
             foreach ($attributes as $attribute) {
                 /** @var Asset $asset */
                 $asset = $attribute->newInstance();
@@ -103,7 +107,6 @@ final class AssetComponentCompilerPass implements CompilerPassInterface
             }
 
             // 1b. Čítanie atribútu #[AsSdcComponent]
-            $sdcAttributes = $reflectionClass->getAttributes(AsSdcComponent::class);
             foreach ($sdcAttributes as $attribute) {
                 /** @var AsSdcComponent $sdcComponent */
                 $sdcComponent = $attribute->newInstance();
@@ -134,10 +137,20 @@ final class AssetComponentCompilerPass implements CompilerPassInterface
 
                 // CSS a JS auto-discovery
                 foreach (['css', 'js'] as $ext) {
-                    $assetFile = $dir . DIRECTORY_SEPARATOR . $baseName . '.' . $ext;
-                    if (file_exists($assetFile)) {
+                    $assetFile = realpath($dir . DIRECTORY_SEPARATOR . $baseName . '.' . $ext);
+                    if ($assetFile && file_exists($assetFile)) {
+                        $shortestPath = null;
+                        foreach ($twigRoots as $root) {
+                            if (str_starts_with($assetFile, $root)) {
+                                $relativePath = ltrim(substr($assetFile, strlen($root)), DIRECTORY_SEPARATOR);
+                                if ($shortestPath === null || strlen($relativePath) < strlen($shortestPath)) {
+                                    $shortestPath = $relativePath;
+                                }
+                            }
+                        }
+
                         $assets[] = [
-                            'path' => $baseName . '.' . $ext,
+                            'path' => $shortestPath ?: ($baseName . '.' . $ext),
                             'type' => $ext,
                             'priority' => 0,
                             'attributes' => [],

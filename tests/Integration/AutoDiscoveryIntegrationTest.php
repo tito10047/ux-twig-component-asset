@@ -27,8 +27,8 @@ class AutoDiscoveryIntegrationTest extends IntegrationTestCase
 
         $assets = $metadataRegistry->getMetadata('AutoDiscoveryComponent');
         $paths = array_column($assets, 'path');
-        $this->assertContains('AutoDiscoveryComponent.css', $paths);
-        $this->assertContains('AutoDiscoveryComponent.js', $paths);
+        $this->assertContains('AutoDiscovery/AutoDiscoveryComponent.css', $paths);
+        $this->assertContains('AutoDiscovery/AutoDiscoveryComponent.js', $paths);
 
         $templatePath = $metadataRegistry->getMetadata('AutoDiscoveryComponent_template');
         $this->assertStringEndsWith('AutoDiscoveryComponent.html.twig', $templatePath);
@@ -47,8 +47,8 @@ class AutoDiscoveryIntegrationTest extends IntegrationTestCase
 
         $assets = $metadataRegistry->getMetadata('SdcAutoDiscoveryComponent');
         $paths = array_column($assets, 'path');
-        $this->assertContains('SdcAutoDiscoveryComponent.css', $paths);
-        $this->assertContains('SdcAutoDiscoveryComponent.js', $paths);
+        $this->assertContains('AutoDiscovery/SdcAutoDiscoveryComponent.css', $paths);
+        $this->assertContains('AutoDiscovery/SdcAutoDiscoveryComponent.js', $paths);
 
         $templatePath = $metadataRegistry->getMetadata('SdcAutoDiscoveryComponent_template');
         $this->assertStringEndsWith('SdcAutoDiscoveryComponent.html.twig', $templatePath);
@@ -99,7 +99,7 @@ class AutoDiscoveryIntegrationTest extends IntegrationTestCase
         $finalHtml = $response->getContent();
 
         // Verify assets are injected (based on auto-discovery filenames)
-        $this->assertStringContainsString('<link rel="stylesheet" href="/assets/AutoDiscoveryComponent.css">', $finalHtml);
-        $this->assertStringContainsString('<script src="/assets/AutoDiscoveryComponent.js"></script>', $finalHtml);
+        $this->assertStringContainsString('<link rel="stylesheet" href="/assets/AutoDiscovery/AutoDiscoveryComponent.css">', $finalHtml);
+        $this->assertStringContainsString('<script src="/assets/AutoDiscovery/AutoDiscoveryComponent.js"></script>', $finalHtml);
     }
 }
