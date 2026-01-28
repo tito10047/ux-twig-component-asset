@@ -7,6 +7,8 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
 use Tito10047\UX\Sdc\Attribute\Asset;
 use Tito10047\UX\Sdc\Attribute\AsSdcComponent;
+use Tito10047\UX\Sdc\Service\ComponentNameGeneratorInterface;
+use Tito10047\UX\Sdc\Service\DefaultComponentNameGenerator;
 use Tito10047\UX\Sdc\Runtime\SdcMetadataRegistry;
 use Tito10047\UX\Sdc\Service\ComponentMetadataResolver;
 use ReflectionClass;
@@ -85,6 +87,16 @@ final class AssetComponentCompilerPass implements CompilerPassInterface
         $componentAssets = [];
         $taggedServices = $container->findTaggedServiceIds('twig.component');
 
+        $nameGenerator = null;
+        if ($container->hasDefinition(DefaultComponentNameGenerator::class)) {
+            $definition = $container->getDefinition(DefaultComponentNameGenerator::class);
+            $namespace = $container->getParameterBag()->resolveValue($definition->getArgument('$componentNamespace'));
+            $separator = $container->getParameterBag()->resolveValue($definition->getArgument('$separator'));
+            $lowercase = $container->getParameterBag()->resolveValue($definition->getArgument('$lowercase'));
+
+            $nameGenerator = new DefaultComponentNameGenerator($namespace, $separator, $lowercase);
+        }
+
         foreach ($taggedServices as $id => $tags) {
             $definition = $container->getDefinition($id);
             $class = $definition->getClass();
@@ -98,6 +110,17 @@ final class AssetComponentCompilerPass implements CompilerPassInterface
                 if (isset($tag['key'])) {
                     $componentName = $tag['key'];
                     break;
+                }
+            }
+
+            if (!$componentName && $nameGenerator) {
+                $componentName = $nameGenerator->generateName($class);
+                if ($componentName) {
+                    $definition->clearTag('twig.component');
+                    foreach ($tags as $tag) {
+                        $tag['key'] = $componentName;
+                        $definition->addTag('twig.component', $tag);
+                    }
                 }
             }
 

@@ -1,13 +1,17 @@
 <?php
 
 use Symfony\Component\DependencyInjection\Loader\Configurator\ContainerConfigurator;
+use Symfony\UX\TwigComponent\Event\PreCreateForRenderEvent;
 use Tito10047\UX\Sdc\Runtime\SdcMetadataRegistry;
+use Tito10047\UX\Sdc\Service\ComponentNameGeneratorInterface;
 use Tito10047\UX\Sdc\Service\AssetRegistry;
 use Tito10047\UX\Sdc\Service\ComponentMetadataResolver;
 use Tito10047\UX\Sdc\EventListener\AssetResponseListener;
 use Tito10047\UX\Sdc\EventListener\ComponentRenderListener;
 use Tito10047\UX\Sdc\EventListener\DevComponentRenderListener;
 use Tito10047\UX\Sdc\Twig\AssetExtension;
+use Tito10047\UX\Sdc\Twig\SdcComponentTemplateFinder;
+use Symfony\UX\TwigComponent\ComponentTemplateFinderInterface;
 use Symfony\Component\AssetMapper\AssetMapperInterface;
 
 use function Symfony\Component\DependencyInjection\Loader\Configurator\service;
@@ -53,6 +57,7 @@ return static function (ContainerConfigurator $container): void {
         ->args([
             service(ComponentMetadataResolver::class),
             service(AssetRegistry::class),
+            service(ComponentNameGeneratorInterface::class),
             '%ux_sdc.component_namespace%',
         ])
         ->tag('kernel.event_listener', [
@@ -62,11 +67,21 @@ return static function (ContainerConfigurator $container): void {
         ->tag('kernel.event_listener', [
             'event' => 'Symfony\UX\TwigComponent\Event\PreRenderEvent',
             'method' => 'onPreRender',
-        ]);
+        ])
+		->tag('kernel.event_listener', [
+			'event' => 'Symfony\UX\TwigComponent\Event\PreCreateForRenderEvent',
+			'method' => 'preCreateForRender',
+		]);
 
     $services->set(AssetExtension::class)
         ->args(['$placeholder' => '<!-- __UX_TWIG_COMPONENT_ASSETS__ -->'])
         ->tag('twig.extension');
+
+    $services->set(SdcComponentTemplateFinder::class)
+        ->decorate('ux.twig_component.component_template_finder')
+        ->args([
+            service('.inner'),
+        ]);
 
     $services = $container->services();
 

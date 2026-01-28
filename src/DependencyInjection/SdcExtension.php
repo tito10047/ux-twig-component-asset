@@ -7,6 +7,8 @@ use Symfony\Component\DependencyInjection\Extension\Extension;
 use Symfony\Component\DependencyInjection\Extension\PrependExtensionInterface;
 use Symfony\Component\DependencyInjection\Loader\PhpFileLoader;
 use Symfony\Component\Config\FileLocator;
+use Tito10047\UX\Sdc\Service\ComponentNameGeneratorInterface;
+use Tito10047\UX\Sdc\Service\DefaultComponentNameGenerator;
 use Tito10047\UX\Sdc\Runtime\SdcMetadataRegistry;
 use Tito10047\UX\Sdc\Service\ComponentMetadataResolver;
 
@@ -57,6 +59,14 @@ class SdcExtension extends Extension implements PrependExtensionInterface
             $namespace = rtrim((string) $config['component_namespace'], '\\') . '\\';
         }
         $container->setParameter('ux_sdc.component_namespace', $namespace);
+
+        $container->register(DefaultComponentNameGenerator::class)
+            ->setArguments([
+                '$componentNamespace' => '%ux_sdc.component_namespace%',
+                '$separator' => $config['name_generator']['separator'],
+                '$lowercase' => $config['name_generator']['lowercase'],
+            ]);
+        $container->setAlias(ComponentNameGeneratorInterface::class, DefaultComponentNameGenerator::class);
 
         if (null !== $namespace) {
             $uxComponentsDir = $container->resolveEnvPlaceholders($config['ux_components_dir'], true);

@@ -35,6 +35,19 @@ class Configuration implements ConfigurationInterface
                     ->defaultValue('<!-- __UX_TWIG_COMPONENT_ASSETS__ -->')
                     ->info('Placeholder v HTML, ktorý bude nahradený asetikami.')
                 ->end()
+                ->arrayNode('name_generator')
+                    ->addDefaultsIfNotSet()
+                    ->children()
+                        ->scalarNode('separator')
+                            ->defaultValue(':')
+                            ->info('Separator pre generovanie názvu komponenty.')
+                        ->end()
+                        ->booleanNode('lowercase')
+                            ->defaultTrue()
+                            ->info('Či sa má názov komponenty generovať malými písmenami.')
+                        ->end()
+                    ->end()
+                ->end()
             ->end();
 
         return $treeBuilder;

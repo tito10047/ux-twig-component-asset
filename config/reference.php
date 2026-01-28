@@ -743,6 +743,10 @@ use Symfony\Component\Config\Loader\ParamConfigurator as Param;
  *     },
  *     auto_discovery?: bool|Param, // Či sa majú automaticky hľadať asety v adresári komponentu. // Default: true
  *     placeholder?: scalar|null|Param, // Placeholder v HTML, ktorý bude nahradený asetikami. // Default: "<!-- __UX_TWIG_COMPONENT_ASSETS__ -->"
+ *     name_generator?: array{
+ *         separator?: scalar|null|Param, // Separator pre generovanie názvu komponenty. // Default: ":"
+ *         lowercase?: bool|Param, // Či sa má názov komponenty generovať malými písmenami. // Default: true
+ *     },
  * }
  * @psalm-type ConfigType = array{
  *     imports?: ImportsConfig,
@@ -752,7 +756,7 @@ use Symfony\Component\Config\Loader\ParamConfigurator as Param;
  *     twig?: TwigConfig,
  *     twig_component?: TwigComponentConfig,
  *     ux_sdc?: UxSdcConfig,
- *     "when@prod"?: array{
+ *     "when@dev"?: array{
  *         imports?: ImportsConfig,
  *         parameters?: ParametersConfig,
  *         services?: ServicesConfig,
@@ -837,7 +841,7 @@ namespace Symfony\Component\Routing\Loader\Configurator;
  *     deprecated?: array{package:string, version:string, message?:string},
  * }
  * @psalm-type RoutesConfig = array{
- *     "when@prod"?: array<string, RouteConfig|ImportConfig|AliasConfig>,
+ *     "when@dev"?: array<string, RouteConfig|ImportConfig|AliasConfig>,
  *     ...<string, RouteConfig|ImportConfig|AliasConfig>
  * }
  */
