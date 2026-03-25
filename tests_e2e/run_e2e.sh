@@ -55,7 +55,6 @@ cp -r "$PROJECT_ROOT/tests_e2e/basic/"* .
 # 6. Overenie
 echo "Running debug:container..."
 JSON_OUTPUT=$(php bin/console debug:container --tag=twig.component --format=json)
-echo "$JSON_OUTPUT"
 
 # Voliteľne: Overenie existencie služby pre náš komponent pomocou php na parsovanie JSONu
 if echo "$JSON_OUTPUT" | php -r '
