@@ -109,7 +109,7 @@ jobs:
                     tools: composer
             -   name: Run E2E tests
                 run: |
-                    ./my-bundle/tests_e2e/run_e2e.sh
+                    ./my-bundle/tests_e2e/run_e2e.sh ${{ github.head_ref || github.ref_name }}
 
     tests-no-maker:
         name: "Tests without Maker (PHP 8.5, Symfony 8.0.*)"

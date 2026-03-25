@@ -24,7 +24,7 @@ use Tito10047\UX\Sdc\DependencyInjection\SdcExtension;
 /**
  * @link https://symfony.com/doc/current/bundles/best_practices.html
  */
-class UxSdcBundle extends AbstractBundle
+class SdcBundle extends AbstractBundle
 {
     public const STIMULUS_CONTROLLER = 'tito10047--ux-sdc--sdc-loader';
 

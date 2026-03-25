@@ -11,6 +11,7 @@
 
 namespace Tito10047\UX\Sdc\Twig;
 
+use Tito10047\UX\Sdc\SdcBundle;
 use Tito10047\UX\Sdc\UxSdcBundle;
 use Twig\Extension\AbstractExtension;
 use Twig\Extension\GlobalsInterface;
@@ -38,7 +39,7 @@ final class AssetExtension extends AbstractExtension implements GlobalsInterface
     public function getGlobals(): array
     {
         return [
-            'sdc_loader_controller' => UxSdcBundle::STIMULUS_CONTROLLER,
+            'sdc_loader_controller' => SdcBundle::STIMULUS_CONTROLLER,
         ];
     }
 }
