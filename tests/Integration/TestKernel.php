@@ -22,6 +22,7 @@ use Symfony\UX\TwigComponent\TwigComponentBundle;
 use Symfony\UX\LiveComponent\LiveComponentBundle;
 use Symfony\UX\StimulusBundle\StimulusBundle;
 use Symfony\Component\Routing\Loader\Configurator\RoutingConfigurator;
+use Tito10047\UX\Sdc\SdcBundle;
 use Tito10047\UX\Sdc\UxSdcBundle;
 
 class TestKernel extends Kernel
@@ -49,7 +50,7 @@ class TestKernel extends Kernel
             new FrameworkBundle(),
             new TwigBundle(),
             new TwigComponentBundle(),
-            new UxSdcBundle(),
+            new SdcBundle(),
         ];
 
         if (class_exists(\Symfony\Bundle\MakerBundle\MakerBundle::class)) {
