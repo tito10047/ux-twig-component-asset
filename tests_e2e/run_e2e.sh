@@ -41,6 +41,9 @@ fi
 # musíme zabezpečiť, aby App\ neprekrývalo náš namespace ak by bol v src/
 # V tomto flow je to v src_component/, takze bundle by to mal zvladnut.
 
+# 3c. Vytvorenie priecinka pre komponenty
+mkdir -p src_component
+
 # 4. Inštalácia závislostí
 BRANCH_NAME=${1:-main}
 composer require symfony/twig-bundle symfony/ux-twig-component webapp --no-interaction
