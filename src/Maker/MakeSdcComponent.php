@@ -48,7 +48,19 @@ final class MakeSdcComponent extends AbstractMaker
         $command
             ->addArgument('name', InputArgument::OPTIONAL, 'The name of the component (e.g. <alternate>Alert</alternate>)')
             ->addOption('stimulus', null, InputOption::VALUE_NONE, 'Whether to generate a Stimulus controller')
-            ->setHelp(file_get_contents(__DIR__.'/../../docs/make_sdc_component.txt'))
+            ->setHelp(<<<EOF
+The <info>make:sdc-component</info> command generates a new Single Directory Component (SDC).
+
+It creates:
+- A PHP class in the component directory
+- A Twig template
+- A CSS file
+- (Optional) A Stimulus controller
+
+Example:
+<info>php bin/console make:sdc-component UI:Alert</info>
+EOF
+            )
         ;
     }
 
