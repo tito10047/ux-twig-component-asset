@@ -104,7 +104,7 @@ composer require tito10047/ux-sdc
 // config/bundles.php
 return [
     // ...
-    Tito10047\UX\Sdc\UxSdcBundle::class => ['all' => true],
+    Tito10047\UX\Sdc\SdcBundle::class => ['all' => true],
 ];
 ```
 
