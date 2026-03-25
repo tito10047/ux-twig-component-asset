@@ -42,8 +42,9 @@ fi
 # V tomto flow je to v src_component/, takze bundle by to mal zvladnut.
 
 # 4. Inštalácia závislostí
+BRANCH_NAME=${1:-main}
 composer require symfony/twig-bundle symfony/ux-twig-component webapp --no-interaction
-composer require tito10047/ux-sdc:dev-main --no-interaction
+composer require tito10047/ux-sdc:dev-$BRANCH_NAME --no-interaction
 
 # 5. Kopírovanie E2E testovacích súborov (z tests_e2e/basic)
 cp -r "$PROJECT_ROOT/tests_e2e/basic/"* .
