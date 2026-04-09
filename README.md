@@ -214,7 +214,54 @@ This will create:
 - `src/Component/UI/Alert/Alert.php` (PHP logic)
 - `src/Component/UI/Alert/Alert.html.twig` (Twig template)
 - `src/Component/UI/Alert/Alert.css` (CSS styles)
-- (Optional) `src/Component/Alert/Alert_controller.js` (Stimulus controller)
+- (Optional) `src/Component/UI/Alert/Alert_controller.js` (Stimulus controller)
+
+The maker supports options and interactive mode:
+- `--stimulus` to force generating a Stimulus controller (non-interactive mode will not create it unless explicitly set)
+- `--action` to generate a minimal controller action and a wrapper Twig template for the component
+
+Example with an action:
+
+```bash
+php bin/console make:sdc-component Page:Homepage --action
+```
+
+This will additionally create:
+- `src/Component/Page/Homepage/HomepageAction.php` (Symfony controller)
+- `src/Component/Page/Homepage/HomepageAction.html.twig` (page template rendering the component)
+
+Generated files contents:
+
+```php
+// src/Component/Page/Homepage/HomepageAction.php
+namespace App\Component\Page\Homepage;
+
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\Routing\Attribute\Route;
+
+class HomepageAction extends AbstractController
+{
+    #[Route('/en', name: 'app.homepage')]
+    public function index(): \Symfony\Component\HttpFoundation\Response
+    {
+        return $this->render('Page/Homepage/HomepageAction.html.twig');
+    }
+}
+```
+
+```twig
+{# src/Component/Page/Homepage/HomepageAction.html.twig #}
+{% extends 'layout.html.twig' %}
+
+{% block content %}
+    <twig:Page:Homepage:Homepage />
+{% endblock %}
+```
+
+In interactive mode, you will be asked:
+- for the component name (supports `:` or `/` separators, e.g. `UI:Alert` or `UI/Alert`)
+- whether to generate a Stimulus controller
+- whether to generate an Action class and template
 
 ---
 
