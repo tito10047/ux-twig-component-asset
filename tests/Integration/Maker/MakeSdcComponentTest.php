@@ -26,6 +26,7 @@ class MakeSdcComponentTest extends IntegrationTestCase
         parent::setUp();
         $this->removeDir(self::getContainer()->getParameter('ux_sdc.ux_components_dir') . '/UI');
         $this->removeDir(self::getContainer()->getParameter('ux_sdc.ux_components_dir') . '/Alert');
+        $this->removeDir(self::getContainer()->getParameter('ux_sdc.ux_components_dir') . '/Page');
     }
 
     protected function tearDown(): void
@@ -33,6 +34,7 @@ class MakeSdcComponentTest extends IntegrationTestCase
         parent::tearDown();
         $this->removeDir(self::getContainer()->getParameter('ux_sdc.ux_components_dir') . '/UI');
         $this->removeDir(self::getContainer()->getParameter('ux_sdc.ux_components_dir') . '/Alert');
+        $this->removeDir(self::getContainer()->getParameter('ux_sdc.ux_components_dir') . '/Page');
     }
 
     private function removeDir(string $dir): void
@@ -85,6 +87,63 @@ class MakeSdcComponentTest extends IntegrationTestCase
         $this->assertStringContainsString('.alert{', $cssContent);
 
         $this->assertStringContainsString('tests/Integration/Fixtures/Component/UI/Alert/Alert.php', $display);
+    }
+
+    public function testMakeSdcComponentWithAction(): void
+    {
+        self::bootKernel();
+        $application = new Application(self::$kernel);
+
+        $command = $application->find('make:sdc-component');
+        $tester = new CommandTester($command);
+
+        // UI:Homepage s voľbou --action
+        $tester->execute([
+            'name' => 'Page:Homepage',
+            '--action' => true,
+        ], [
+            'interactive' => false,
+        ]);
+
+        $tester->assertCommandIsSuccessful();
+
+        $baseDir = self::getContainer()->getParameter('ux_sdc.ux_components_dir');
+        $this->assertFileExists($baseDir . '/Page/Homepage/Homepage.php');
+        $this->assertFileExists($baseDir . '/Page/Homepage/HomepageAction.php');
+        $this->assertFileExists($baseDir . '/Page/Homepage/HomepageAction.html.twig');
+
+        $actionPhpContent = file_get_contents($baseDir . '/Page/Homepage/HomepageAction.php');
+        $this->assertStringContainsString('namespace Tito10047\UX\Sdc\Tests\Integration\Fixtures\Component\Page\Homepage;', $actionPhpContent);
+        $this->assertStringContainsString('class HomepageAction extends AbstractController', $actionPhpContent);
+        $this->assertStringContainsString('#[Route(\'/en\', name: \'app.homepage\')]', $actionPhpContent);
+        $this->assertStringContainsString('return $this->render(\'Page/Homepage/HomepageAction.html.twig\');', $actionPhpContent);
+
+        $actionTwigContent = file_get_contents($baseDir . '/Page/Homepage/HomepageAction.html.twig');
+        $this->assertStringContainsString('{% extends \'layout.html.twig\' %}', $actionTwigContent);
+        $this->assertStringContainsString('<twig:Page:Homepage:Homepage />', $actionTwigContent);
+    }
+
+    public function testMakeSdcComponentInteractiveWithAction(): void
+    {
+        self::bootKernel();
+        $application = new Application(self::$kernel);
+
+        $command = $application->find('make:sdc-component');
+        $tester = new CommandTester($command);
+
+        $tester->setInputs([
+            'Page:Homepage', // Component name
+            'n',             // Stimulus?
+            'y',             // Action?
+        ]);
+
+        $tester->execute([]);
+
+        $tester->assertCommandIsSuccessful();
+
+        $baseDir = self::getContainer()->getParameter('ux_sdc.ux_components_dir');
+        $this->assertFileExists($baseDir . '/Page/Homepage/HomepageAction.php');
+        $this->assertFileExists($baseDir . '/Page/Homepage/HomepageAction.html.twig');
     }
 
     public function testMakeSdcComponentWithColonSeparator(): void

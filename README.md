@@ -11,6 +11,24 @@
 
 A Symfony bundle that implements the **Single Directory Component (SDC)** methodology for Symfony UX. It bridges the gap between **AssetMapper** and **Twig Components** by providing a fully automated, convention-over-configuration workflow.
 
+## Real-world Usage & Developer Experience
+
+This bundle is actively used in production. Here are some real-world examples:
+- [formalitka.mostka.sk](https://formalitka.mostka.sk/)
+- [mostka.sk](https://mostka.sk/)
+- [ycon.cc](https://ycon.cc)
+
+### Developer Evaluation
+Working with UX SDC provides an excellent developer experience. A recommended project structure organizes the code into distinct functional areas:
+- **UI**: Generic interface elements (e.g., `Button`, `Spinner`, `Tabs`).
+- **Layout**: Structural page elements (e.g., `TopBar`, `Footer`, `FlashMessage`).
+- **Component**: Reusable feature blocks.
+- **Page**: Complete page components (e.g., `Homepage`, `AboutUs`).
+
+A significant advantage of this architecture is the ability to place Symfony controllers directly within the page-level SDC component directory (e.g., `HomepageAction.php`). The controller merely handles routing and renders the base layout, while all business and presentation logic remains encapsulated in isolated SDC components.
+
+Because the code is highly granular and strictly structured, AI tools work exceptionally well within this architecture, easily generating robust and creative design implementations.
+
 ## The Concept
 
 This bundle is inspired by the architectural challenges discussed in **["A Better Architecture for Your Symfony UX Twig Components"](https://hugo.alliau.me/blog/posts/a-better-architecture-for-your-symfony-ux-twig-components)** by **Hugo Alliaume**.
@@ -214,7 +232,54 @@ This will create:
 - `src/Component/UI/Alert/Alert.php` (PHP logic)
 - `src/Component/UI/Alert/Alert.html.twig` (Twig template)
 - `src/Component/UI/Alert/Alert.css` (CSS styles)
-- (Optional) `src/Component/Alert/Alert_controller.js` (Stimulus controller)
+- (Optional) `src/Component/UI/Alert/Alert_controller.js` (Stimulus controller)
+
+The maker supports options and interactive mode:
+- `--stimulus` to force generating a Stimulus controller (non-interactive mode will not create it unless explicitly set)
+- `--action` to generate a minimal controller action and a wrapper Twig template for the component
+
+Example with an action:
+
+```bash
+php bin/console make:sdc-component Page:Homepage --action
+```
+
+This will additionally create:
+- `src/Component/Page/Homepage/HomepageAction.php` (Symfony controller)
+- `src/Component/Page/Homepage/HomepageAction.html.twig` (page template rendering the component)
+
+Generated files contents:
+
+```php
+// src/Component/Page/Homepage/HomepageAction.php
+namespace App\Component\Page\Homepage;
+
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\Routing\Attribute\Route;
+
+class HomepageAction extends AbstractController
+{
+    #[Route('/en', name: 'app.homepage')]
+    public function index(): \Symfony\Component\HttpFoundation\Response
+    {
+        return $this->render('Page/Homepage/HomepageAction.html.twig');
+    }
+}
+```
+
+```twig
+{# src/Component/Page/Homepage/HomepageAction.html.twig #}
+{% extends 'layout.html.twig' %}
+
+{% block content %}
+    <twig:Page:Homepage:Homepage />
+{% endblock %}
+```
+
+In interactive mode, you will be asked:
+- for the component name (supports `:` or `/` separators, e.g. `UI:Alert` or `UI/Alert`)
+- whether to generate a Stimulus controller
+- whether to generate an Action class and template
 
 ---
 

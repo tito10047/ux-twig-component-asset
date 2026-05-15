@@ -48,6 +48,7 @@ final class MakeSdcComponent extends AbstractMaker
         $command
             ->addArgument('name', InputArgument::OPTIONAL, 'The name of the component (e.g. <alternate>Alert</alternate>)')
             ->addOption('stimulus', null, InputOption::VALUE_NONE, 'Whether to generate a Stimulus controller')
+            ->addOption('action', null, InputOption::VALUE_NONE, 'Whether to generate an action class and template')
             ->setHelp(<<<EOF
 The <info>make:sdc-component</info> command generates a new Single Directory Component (SDC).
 
@@ -56,6 +57,7 @@ It creates:
 - A Twig template
 - A CSS file
 - (Optional) A Stimulus controller
+- (Optional) An Action class and template
 
 Example:
 <info>php bin/console make:sdc-component UI:Alert</info>
@@ -78,6 +80,15 @@ EOF
             $withStimulus = false;
         } else {
             $withStimulus = $io->confirm('Do you want to generate a Stimulus controller?', true);
+        }
+
+        if ($input->getOption('action')) {
+            $withAction = true;
+        } elseif (!$input->isInteractive()) {
+            // In non-interactive mode, do NOT generate Action unless explicitly requested
+            $withAction = false;
+        } else {
+            $withAction = $io->confirm('Do you want to generate an Action class and template?', false);
         }
 
         $name = str_replace(['/', ':'], '\\', $name);
@@ -127,6 +138,27 @@ EOF
                 __DIR__.'/../../templates/sdc/controller.tpl.php',
                 [
                     'component_name' => $componentName,
+                ]
+            );
+        }
+
+        if ($withAction) {
+            $fullTwigComponentName = ($subPath ? str_replace('/', ':', $subPath) . ':' : '') . $componentName . ':' . $componentName;
+
+            $generator->generateClass(
+                $fullNamespace . '\\' . $componentName . '\\' . $componentName . 'Action',
+                __DIR__.'/../../templates/sdc/Action.tpl.php',
+                [
+                    'component_name' => $componentName,
+                    'sub_path' => $subPath,
+                ]
+            );
+
+            $generator->generateFile(
+                $directory . '/' . $componentName . '/' . $componentName . 'Action.html.twig',
+                __DIR__.'/../../templates/sdc/ActionTemplate.tpl.php',
+                [
+                    'full_twig_component_name' => $fullTwigComponentName,
                 ]
             );
         }
