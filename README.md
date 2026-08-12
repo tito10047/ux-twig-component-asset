@@ -66,12 +66,14 @@ src_component/
 ```php
 namespace App\Component\Alert;
 
+use Symfony\UX\TwigComponent\Attribute\AsTwigComponent;
 use Tito10047\UX\Sdc\Attribute\AsSdcComponent;
 use Tito10047\UX\Sdc\Twig\ComponentNamespaceInterface;
 use Tito10047\UX\Sdc\Twig\Stimulus;
 
-#[AsSdcComponent] // No need to define names, templates, or assets. It's all inferred!
-class Alert
+#[AsTwigComponent]  // Registers the component with Symfony UX
+#[AsSdcComponent]   // Enables auto-discovery of sibling CSS/JS/Twig files
+class Alert implements ComponentNamespaceInterface
 {
     use Stimulus;
 
@@ -94,11 +96,11 @@ In the `Alert.html.twig` template, you can then use the automatically generated 
 
 ## Key Features
 
-* **Automatic Registration:** Every class marked with `#[AsSdcComponent]` is automatically discovered and registered.
+* **Clear Separation of Concerns:** `#[AsTwigComponent]` registers the component; `#[AsSdcComponent]` opts it into SDC behaviour (auto-discovery). Use `#[SdcAsset]` for explicit asset paths.
 * **Smart Template Mapping:** Forget `template: 'components/Alert.html.twig'`. If the template is in the same folder as your class, it's found automatically.
 * **Asset Orchestration:** CSS and JS files in your component folder are collected during rendering and injected into the `<head>`.
 * **Automatic Stimulus Controllers:** By using the `Stimulus` trait and `ComponentNamespaceInterface`, your component automatically gets a `controller` variable representing its Stimulus controller name based on its namespace.
-* **Support for Live Components:** Works seamlessly with `#[AsLiveComponent]` and `#[Asset]` attributes for modern, reactive interfaces.
+* **Support for Live Components:** Works seamlessly with `#[AsLiveComponent]` and `#[AsSdcComponent]` / `#[SdcAsset]` attributes for modern, reactive interfaces.
 * **No "Phantom" Controllers:** Load component-specific CSS via **AssetMapper** without the need for empty Stimulus controllers just for imports.
 * **Performance First:** * **Compiler Pass:** All file discovery happens at build time. Zero reflection in production.
 * **Response Post-processing:** Assets are injected at the end of the request.
@@ -193,12 +195,12 @@ namespace App\Component\Search;
 
 use Symfony\UX\LiveComponent\Attribute\AsLiveComponent;
 use Symfony\UX\LiveComponent\DefaultActionTrait;
-use Tito10047\UX\Sdc\Attribute\Asset;
+use Tito10047\UX\Sdc\Attribute\AsSdcComponent;
 use Tito10047\UX\Sdc\Twig\ComponentNamespaceInterface;
 use Tito10047\UX\Sdc\Twig\Stimulus;
 
 #[AsLiveComponent]
-#[Asset] // Automatically discovers Search.css and Search_controller.js
+#[AsSdcComponent] // Automatically discovers Search.css and Search_controller.js
 class Search implements ComponentNamespaceInterface
 {
     use DefaultActionTrait;
@@ -283,10 +285,37 @@ In interactive mode, you will be asked:
 
 ---
 
+## Attributes Reference
+
+| Attribute | Purpose |
+|-----------|---------|
+| `#[AsTwigComponent]` | Standard Symfony UX attribute — registers the component. Required on all components. |
+| `#[AsSdcComponent]` | Marks the class as an SDC component. When used without `path`, enables auto-discovery of sibling `.css`, `.js`, and `.html.twig` files. When used with `path`, also injects that explicit asset. Repeatable. |
+| `#[SdcAsset(path: '...')]` | Injects an explicit asset path without triggering auto-discovery. Useful for additional assets beyond auto-discovered ones. Repeatable. |
+
+```php
+// Auto-discovery only
+#[AsTwigComponent]
+#[AsSdcComponent]
+class Button {}
+
+// Explicit assets only (no auto-discovery)
+#[AsTwigComponent]
+#[SdcAsset(path: 'css/button.css')]
+#[SdcAsset(path: 'js/button.js')]
+class Button {}
+
+// Both: auto-discovery + one extra explicit asset
+#[AsTwigComponent]
+#[AsSdcComponent]
+#[SdcAsset(path: 'vendor/some-lib.css', priority: 10)]
+class Button {}
+```
+
 ## How It Works
 
-1. **Discovery:** During container compilation, the bundle scans your component directory. It maps PHP classes to their neighboring `.twig`, `.css`, and `.js` files.
-2. **Rendering:** When a component is used on a page, the bundle's listener intercepts the `PreCreateForRenderEvent` and logs its required assets.
+1. **Discovery:** During container compilation, the bundle scans your component directory. It maps PHP classes marked with `#[AsSdcComponent]` to their neighboring `.twig`, `.css`, and `.js` files.
+2. **Rendering:** When a component is used on a page, the bundle's listener intercepts the render events and logs its required assets.
 3. **Injection:** The `AssetResponseListener` replaces your Twig placeholder with the actual `<link>` and `<script>` tags and adds HTTP preload headers to the response.
 
 ## Why SDC?

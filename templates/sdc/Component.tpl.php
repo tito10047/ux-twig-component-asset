@@ -14,12 +14,14 @@
 
 namespace <?= $namespace ?>;
 
+use Symfony\UX\TwigComponent\Attribute\AsTwigComponent;
 use Tito10047\UX\Sdc\Attribute\AsSdcComponent;
 <?php if ($with_stimulus): ?>
 use Tito10047\UX\Sdc\Twig\ComponentNamespaceInterface;
 use Tito10047\UX\Sdc\Twig\Stimulus;
 <?php endif; ?>
 
+#[AsTwigComponent]
 #[AsSdcComponent]
 class <?= $class_name ?><?php if ($with_stimulus): ?> implements ComponentNamespaceInterface<?php endif; ?>
 

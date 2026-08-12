@@ -14,7 +14,6 @@ namespace Tito10047\UX\Sdc\CompilerPass;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
-use Tito10047\UX\Sdc\Attribute\Asset;
 use Tito10047\UX\Sdc\Attribute\AsSdcComponent;
 use Tito10047\UX\Sdc\Runtime\SdcMetadataRegistry;
 use Tito10047\UX\Sdc\Service\ComponentMetadataResolver;

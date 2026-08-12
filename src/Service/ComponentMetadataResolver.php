@@ -12,8 +12,8 @@
 namespace Tito10047\UX\Sdc\Service;
 
 use ReflectionClass;
-use Tito10047\UX\Sdc\Attribute\Asset;
 use Tito10047\UX\Sdc\Attribute\AsSdcComponent;
+use Tito10047\UX\Sdc\Attribute\SdcAsset;
 
 class ComponentMetadataResolver
 {
@@ -100,42 +100,28 @@ class ComponentMetadataResolver
         foreach ($attributes as $attribute) {
             $attributeName = $attribute->getName();
 
-            if ($attributeName === Asset::class) {
-                /** @var Asset $asset */
-                $asset = $attribute->newInstance();
-                if ($asset->path) {
-                    $assets[] = [
-                        'path' => $asset->path,
-                        'type' => $asset->type ?? '',
-                        'priority' => $asset->priority,
-                        'attributes' => $asset->attributes,
-                    ];
-                }
-            }
-        }
-
-        foreach ($attributes as $attribute) {
-            $attributeName = $attribute->getName();
-
             if ($attributeName === AsSdcComponent::class) {
                 /** @var AsSdcComponent $sdcComponent */
                 $sdcComponent = $attribute->newInstance();
-
-                if ($sdcComponent->css) {
+                if ($sdcComponent->path) {
                     $assets[] = [
-                        'path' => $sdcComponent->css,
-                        'type' => 'css',
-                        'priority' => 0,
-                        'attributes' => [],
+                        'path' => $sdcComponent->path,
+                        'type' => $sdcComponent->type ?? '',
+                        'priority' => $sdcComponent->priority,
+                        'attributes' => $sdcComponent->attributes,
                     ];
                 }
+            }
 
-                if ($sdcComponent->js) {
+            if ($attributeName === SdcAsset::class) {
+                /** @var SdcAsset $sdcAsset */
+                $sdcAsset = $attribute->newInstance();
+                if ($sdcAsset->path) {
                     $assets[] = [
-                        'path' => $sdcComponent->js,
-                        'type' => 'js',
-                        'priority' => 0,
-                        'attributes' => [],
+                        'path' => $sdcAsset->path,
+                        'type' => $sdcAsset->type ?? '',
+                        'priority' => $sdcAsset->priority,
+                        'attributes' => $sdcAsset->attributes,
                     ];
                 }
             }

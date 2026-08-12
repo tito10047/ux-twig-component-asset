@@ -20,27 +20,39 @@ class AsSdcComponentTest extends TestCase
     public function testInstantiate(): void
     {
         $attribute = new AsSdcComponent(
-            name: 'my_component',
-            template: 'components/my_component.html.twig',
-            css: 'css/style.css',
-            js: 'js/script.js',
-            exposePublicProps: false,
-            attributesVar: 'attrs'
+            path: 'css/style.css',
+            type: 'css',
+            priority: 5,
+            attributes: ['defer' => true],
         );
 
-        $this->assertInstanceOf(AsTwigComponent::class, $attribute);
-        $this->assertSame('my_component', $attribute->serviceConfig()['key']);
-        $this->assertSame('components/my_component.html.twig', $attribute->serviceConfig()['template']);
-        $this->assertSame('css/style.css', $attribute->css);
-        $this->assertSame('js/script.js', $attribute->js);
+        $this->assertSame('css/style.css', $attribute->path);
+        $this->assertSame('css', $attribute->type);
+        $this->assertSame(5, $attribute->priority);
+        $this->assertSame(['defer' => true], $attribute->attributes);
     }
 
     public function testDefaultValues(): void
     {
-        $attribute = new AsSdcComponent('my_component');
+        $attribute = new AsSdcComponent();
 
-        $this->assertSame('my_component', $attribute->serviceConfig()['key']);
-        $this->assertNull($attribute->css);
-        $this->assertNull($attribute->js);
+        $this->assertNull($attribute->path);
+        $this->assertNull($attribute->type);
+        $this->assertSame(0, $attribute->priority);
+        $this->assertSame([], $attribute->attributes);
+    }
+
+    public function testIsRepeatable(): void
+    {
+        $reflection = new \ReflectionClass(AsSdcComponent::class);
+        $phpAttributes = $reflection->getAttributes(\Attribute::class);
+        $this->assertNotEmpty($phpAttributes);
+        $attrInstance = $phpAttributes[0]->newInstance();
+        $this->assertTrue((bool) ($attrInstance->flags & \Attribute::IS_REPEATABLE));
+    }
+
+    public function testDoesNotExtendAsTwigComponent(): void
+    {
+        $this->assertNotInstanceOf(AsTwigComponent::class, new AsSdcComponent());
     }
 }

@@ -12,19 +12,18 @@
 namespace Tito10047\UX\Sdc\Attribute;
 
 use Attribute;
-use Symfony\UX\TwigComponent\Attribute\AsTwigComponent;
 
-#[Attribute(Attribute::TARGET_CLASS)]
-class AsSdcComponent extends AsTwigComponent
+#[Attribute(Attribute::TARGET_CLASS | Attribute::IS_REPEATABLE)]
+final class AsSdcComponent
 {
+    /**
+     * @param array<string, mixed> $attributes
+     */
     public function __construct(
-        ?string $name = null,
-        ?string $template = null,
-        bool $exposePublicProps = true,
-        string $attributesVar = 'attributes',
-        public ?string $css = null,
-        public ?string $js = null,
+        public ?string $path = null,
+        public ?string $type = null,
+        public int $priority = 0,
+        public array $attributes = [],
     ) {
-        parent::__construct($name, $template, $exposePublicProps, $attributesVar);
     }
 }

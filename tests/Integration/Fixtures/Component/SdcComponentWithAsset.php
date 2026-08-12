@@ -11,11 +11,13 @@
 
 namespace Tito10047\UX\Sdc\Tests\Integration\Fixtures\Component;
 
-use Tito10047\UX\Sdc\Attribute\AsSdcComponent;
-use Tito10047\UX\Sdc\Attribute\Asset;
+use Symfony\UX\TwigComponent\Attribute\AsTwigComponent;
+use Tito10047\UX\Sdc\Attribute\SdcAsset;
 
-#[AsSdcComponent('SdcComponentWithAsset', template: 'components/SdcComponent.html.twig', css: 'css/sdc.css', js: 'js/sdc.js')]
-#[Asset(path: 'css/extra.css')]
+#[AsTwigComponent('SdcComponentWithAsset', template: 'components/SdcComponent.html.twig')]
+#[SdcAsset(path: 'css/sdc.css', type: 'css')]
+#[SdcAsset(path: 'js/sdc.js', type: 'js')]
+#[SdcAsset(path: 'css/extra.css')]
 class SdcComponentWithAsset
 {
 }
