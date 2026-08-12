@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [1.0.0] - 2026-08-12
 
+### Added
+
+- **Short component tag alias**: When a component's directory name matches its class name (e.g. `Alert/Alert.php`), the bundle now automatically registers a shorter Twig tag. `<twig:Alert/>` works as an alias for `<twig:Alert:Alert/>`. This applies at any nesting level — `App\UI\Alert\Alert` is reachable as both `<twig:UI:Alert:Alert/>` and `<twig:UI:Alert/>`.
+
 ### Changed
 
 - **Breaking Change**: `#[AsSdcComponent]` no longer extends `#[AsTwigComponent]`. It is now a standalone, repeatable attribute used alongside `#[AsTwigComponent]` (or `#[AsLiveComponent]`). It marks a class as an SDC component and enables auto-discovery of sibling `.css`, `.js`, and `.html.twig` files. Optionally accepts an explicit `path`/`type`/`priority`/`attributes` to inject a specific asset.
@@ -23,7 +27,7 @@ use Tito10047\UX\Sdc\Attribute\Asset;
 class Alert {}
 
 #[AsTwigComponent('Search')]
-#[Asset(path: 'Search.css')]
+#[Asset(path: 'custom_css.css')]
 class Search {}
 ```
 

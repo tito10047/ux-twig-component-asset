@@ -236,6 +236,17 @@ This will create:
 - `src/Component/UI/Alert/Alert.css` (CSS styles)
 - (Optional) `src/Component/UI/Alert/Alert_controller.js` (Stimulus controller)
 
+#### Short tag alias
+
+When the directory name matches the class name, the bundle registers a **shorter alias** automatically. Both tags below render the same component:
+
+```twig
+<twig:UI:Alert:Alert />  {# full name #}
+<twig:UI:Alert />        {# short alias — directory = class name #}
+```
+
+This works at any nesting depth. `<twig:Alert/>` is the short form of `<twig:Alert:Alert/>`.
+
 The maker supports options and interactive mode:
 - `--stimulus` to force generating a Stimulus controller (non-interactive mode will not create it unless explicitly set)
 - `--action` to generate a minimal controller action and a wrapper Twig template for the component
@@ -274,7 +285,7 @@ class HomepageAction extends AbstractController
 {% extends 'layout.html.twig' %}
 
 {% block content %}
-    <twig:Page:Homepage:Homepage />
+    <twig:Page:Homepage />
 {% endblock %}
 ```
 
