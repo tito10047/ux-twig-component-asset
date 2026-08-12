@@ -52,7 +52,9 @@ final class ComponentAliasCompilerPass implements CompilerPassInterface
 
                 if (\count($parts) >= 2 && end($parts) === $parts[\count($parts) - 2]) {
                     $shortName = implode(':', \array_slice($parts, 0, -1));
-                    $definition->addTag('twig.component', ['key' => $shortName]);
+					$def = ($definition->getTag('twig.component')[0])??[];
+					$def['key'] = $shortName;
+					$definition->addTag('twig.component', $def);
                 }
             }
         }
